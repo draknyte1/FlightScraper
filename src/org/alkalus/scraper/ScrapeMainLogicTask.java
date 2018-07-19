@@ -24,6 +24,11 @@ public class ScrapeMainLogicTask implements Runnable {
 		Logger.INFO("Created the main logic thread. Waiting to init.");
 		while (mIsWaiting) {
 			
+			if (!mIsWaiting || ((System.currentTimeMillis()/1000)-mStartWaitTime >= 60)) {
+				Logger.INFO("Waited long enough, let's continue");
+				break;
+			}
+			
 			if (FlightScraper.mInternalTickTimer % 20 == 0) {
 				long progress = (System.currentTimeMillis()/1000)-mStartWaitTime;
 				double perc = progress/60d;
@@ -32,36 +37,41 @@ public class ScrapeMainLogicTask implements Runnable {
 					d.setValue((int) perc*100);
 					d.repaint();
 					FlightScraper.getGUI().getWindow().setProgressBar(d);
-					Logger.INFO("Loading "+perc*100+"%");
 				}
-				if ((perc*100) >= 25) {
+				if ((perc*100) >= 10) {
 					if (parent.getWebClient() == null) {
 						parent.setWebClient(new ScraperClient());
 					}
 					else {
+						Logger.INFO("Created Web Client.");
 						setWaiting(false);
 					}
 				}
-			}			
-			if (!mIsWaiting || ((System.currentTimeMillis()/1000)-mStartWaitTime >= 60)) {
-				break;
 			}
 		}
-		Logger.INFO("Waited long enough, let's continue");
+		
+		
 		FlightScraper.getGUI().getWindow().getProgressBar().setValue((int) 0);
+		FlightScraper.getGUI().getWindow().getProgressBar().repaint();
+		
+		if (!mIsWaiting) {
+			Logger.INFO("Setting up web client.");
+		}
+		
 		while (!mIsWaiting) {			
 			
-			long progress = (System.currentTimeMillis()/1000)-mStartWaitTime;
-			double perc = progress/60d;
-			if (perc <= 1d) {
-				FlightScraper.getGUI().getWindow().getProgressBar().setValue((int) perc*100);
-			}
+			//Main Thread Loop Starts here
 			
-			if (!MainFrame.mReady || !FlightScraper.mIsMainFrameVisible || ((System.currentTimeMillis()/1000)-mStartWaitTime >= 60)) {
+			//Check for exit first
+			if (!MainFrame.mReady || !FlightScraper.mIsMainFrameVisible) {
 				Logger.INFO("mReady: "+MainFrame.mReady+" | mIsMainFrameVisible: "+FlightScraper.mIsMainFrameVisible);
 				close();
 				break;
 			}
+			
+			//Update the Progress bar
+			FlightScraper.getGUI().getWindow().getProgressBar().setIndeterminate(true);
+			FlightScraper.getGUI().getWindow().getProgressBar().repaint();
 			
 			/*
 			 * Do things here~
