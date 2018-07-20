@@ -107,6 +107,7 @@ public class FlightScraper  {
 		}		
 		if (milliPast % 1000 == 0) {
 			seconds = (TimeUnit.MILLISECONDS.toSeconds(milliPast));
+			mInternalTickTimer = seconds/20;
 			weeks = (int) (TimeUnit.SECONDS.toDays(seconds) / 7);
 			days = (int) (TimeUnit.SECONDS.toDays(seconds) - 7 * weeks);
 			hours = TimeUnit.SECONDS.toHours(seconds) - TimeUnit.DAYS.toHours(days) - TimeUnit.DAYS.toHours(7*weeks);

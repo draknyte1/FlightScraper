@@ -4,7 +4,10 @@ import javax.swing.JProgressBar;
 
 import org.alkalus.FlightScraper;
 import org.alkalus.browser.ScraperClient;
+import org.alkalus.browser.ScraperClient.WebPage;
 import org.alkalus.gui.MainFrame;
+import org.alkalus.objects.AutoMap;
+import org.alkalus.objects.Date;
 import org.alkalus.objects.Logger;
 
 public class ScrapeMainLogicTask implements Runnable {
@@ -24,8 +27,7 @@ public class ScrapeMainLogicTask implements Runnable {
 		Logger.INFO("Created the main logic thread. Waiting to init.");
 		while (mIsWaiting) {
 			
-			if (!mIsWaiting || ((System.currentTimeMillis()/1000)-mStartWaitTime >= 60)) {
-				Logger.INFO("Waited long enough, let's continue");
+			if (!MainFrame.mReady || !FlightScraper.mIsMainFrameVisible || !mIsWaiting || ((System.currentTimeMillis()/1000)-mStartWaitTime >= 60)) {
 				break;
 			}
 			
@@ -72,10 +74,6 @@ public class ScrapeMainLogicTask implements Runnable {
 			//Update the Progress bar
 			FlightScraper.getGUI().getWindow().getProgressBar().setIndeterminate(true);
 			FlightScraper.getGUI().getWindow().getProgressBar().repaint();
-			
-			/*
-			 * Do things here~
-			 */
 			
 		}		
 	}

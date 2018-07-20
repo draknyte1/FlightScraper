@@ -20,6 +20,8 @@ import javax.swing.SwingConstants;
 
 import org.alkalus.gui.listeners.CloseButtonListener;
 import org.alkalus.gui.listeners.RunButtonListener;
+import org.alkalus.objects.Logger;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.ChangeListener;
@@ -50,6 +52,8 @@ public class MainFrameGUI {
 	private JCheckBox stopRunningIfTimeOut;
 	private JCheckBox checkbox_Info_ExtendedSearch;
 	private JProgressBar progressBar;
+	private JButton btnRun;
+	private JButton btnExit;
 
 	private static final String[] MONTHS = new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 	private static final String[] YEARS = new String[] {"2018", "2019", "2020"};
@@ -66,6 +70,7 @@ public class MainFrameGUI {
 			combo_Year_Start.setEnabled(true);
 			combo_Year_Finish.setEnabled(true);
 			checkbox_Info_ExtendedSearch.setEnabled(true);
+			btnRun.setEnabled(true);
 			mLockGUI = false;			
 		}
 		else {
@@ -78,6 +83,7 @@ public class MainFrameGUI {
 			if (combo_Month_Finish.isEnabled() == true) combo_Month_Finish.setEnabled(false);
 			if (combo_Year_Finish.isEnabled() == true) combo_Year_Finish.setEnabled(false);
 			checkbox_Info_ExtendedSearch.setEnabled(false);
+			btnRun.setEnabled(false);
 			mLockGUI = true;
 		}	
 	}
@@ -85,7 +91,7 @@ public class MainFrameGUI {
 	/**
 	 * Launch the application.
 	 */
-	/*public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -121,7 +127,7 @@ public class MainFrameGUI {
 		frame_Grand_Sky_Scraper.getContentPane().add(panel, BorderLayout.SOUTH);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		JButton btnRun = new JButton("Run");
+		btnRun = new JButton("Run");
 		btnRun.addActionListener(new RunButtonListener());
 		panel.add(btnRun);
 
@@ -140,7 +146,7 @@ public class MainFrameGUI {
 		progressBar.setMaximum(100);
 		panel.add(progressBar);
 
-		JButton btnExit = new JButton("Exit");
+		btnExit = new JButton("Exit");
 		btnExit.addActionListener(new CloseButtonListener());
 		panel.add(btnExit);
 
@@ -325,7 +331,6 @@ public class MainFrameGUI {
 
 		field_Integer_Day_Finish_Scan = new JFormattedTextField();
 		field_Integer_Day_Finish_Scan.setText("1");
-		field_Integer_Day_Finish_Scan.setEnabled(false);
 		field_Integer_Day_Finish_Scan.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
 		gbc_textField_1.insets = new Insets(0, 0, 5, 5);
@@ -336,7 +341,6 @@ public class MainFrameGUI {
 		field_Integer_Day_Finish_Scan.setColumns(10);
 
 		combo_Month_Finish = new JComboBox();
-		combo_Month_Finish.setEnabled(false);
 		combo_Month_Finish.setModel(new DefaultComboBoxModel(MONTHS));
 		GridBagConstraints gbc_combo_Month_Finish = new GridBagConstraints();
 		gbc_combo_Month_Finish.insets = new Insets(0, 0, 5, 5);
@@ -346,7 +350,6 @@ public class MainFrameGUI {
 		panel_1.add(combo_Month_Finish, gbc_combo_Month_Finish);
 
 		combo_Year_Finish = new JComboBox();
-		combo_Year_Finish.setEnabled(false);
 		combo_Year_Finish.setModel(new DefaultComboBoxModel(YEARS));
 		GridBagConstraints gbc_combo_Year_Finish = new GridBagConstraints();
 		gbc_combo_Year_Finish.insets = new Insets(0, 0, 5, 5);
@@ -364,14 +367,10 @@ public class MainFrameGUI {
 				/*
 				 * Check if we are ready
 				 */
-				if (checkbox_Info_ExtendedSearch.isSelected()) {
-					isUsingExtendedDates = true;
-				}
-				else {
-					isUsingExtendedDates = false;					
-				} 
+				isUsingExtendedDates = checkbox_Info_ExtendedSearch.isSelected();
+				Logger.INFO("Using Extended Search? "+isUsingExtendedDates);
 
-				if (!mLockGUI) {
+				/*if (!mLockGUI) {
 					if (!isUsingExtendedDates) {
 						field_Integer_Day_Finish_Scan.setEnabled(false);
 						combo_Month_Finish.setEnabled(false);
@@ -387,7 +386,7 @@ public class MainFrameGUI {
 					field_Integer_Day_Finish_Scan.setEnabled(false);
 					combo_Month_Finish.setEnabled(false);
 					combo_Year_Finish.setEnabled(false);					
-				}
+				}*/
 			}
 		});
 		GridBagConstraints gbc_chckbxUsingDateRange = new GridBagConstraints();

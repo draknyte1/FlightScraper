@@ -7,7 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.alkalus.FlightScraper;
 import org.alkalus.browser.ScraperClient;
+import org.alkalus.browser.ScraperClient.WebPage;
 import org.alkalus.gui.MainFrame;
+import org.alkalus.objects.AutoMap;
 import org.alkalus.objects.Date;
 import org.alkalus.objects.Date.Month;
 import org.alkalus.objects.Logger;
@@ -20,10 +22,10 @@ public class ScrapeManager {
 	private static boolean mSkyScanner = false;
 	private static boolean mWebJet = false;
 
-	private final String KEY_DEPARTURE_CODE;
-	private final String KEY_ARRIVAL_CODE;
-	private final Date DATE_SCAN_START;
-	private final Date DATE_SCAN_END;
+	public final String KEY_DEPARTURE_CODE;
+	public final String KEY_ARRIVAL_CODE;
+	public final Date DATE_SCAN_START;
+	public final Date DATE_SCAN_END;
 	
 	private final boolean mExtendedScanning;
 	
@@ -34,8 +36,8 @@ public class ScrapeManager {
 	private ScraperClient mScraperWebClient;
 	
 	//Worker Pool and Executor
-	private final ThreadPoolExecutor mWorkerThreadExecutor;
-	private final ExecutorService mWorkerThreadPool;
+	public final ThreadPoolExecutor mWorkerThreadExecutor;
+	public final ExecutorService mWorkerThreadPool;
 	
 	public ScrapeManager(String AIRPORT_CODE_DEPARTURE, String AIRPORT_CODE_ARRIVAL, Date aDepartureDate) {
 		this(AIRPORT_CODE_DEPARTURE, AIRPORT_CODE_ARRIVAL, aDepartureDate, null);
@@ -61,11 +63,11 @@ public class ScrapeManager {
 		Logger.INFO("Departing: "+AIRPORT_CODE_DEPARTURE);
 		Logger.INFO("Arrival: "+AIRPORT_CODE_ARRIVAL);
 		Logger.INFO("Departure Date: "+aDepartureDate.toString());
-		if (aFinalDate != null && aFinalDate.day() == -1) {
+		if (aFinalDate != null && aFinalDate.day() != -1) {
 			Logger.INFO("Scanning until: "+aFinalDate.toString());			
 		}
 		else {
-			Logger.INFO("Single day search initiated.");			
+			Logger.INFO("Single day search initiated.");
 		}
 		
 		int aValidDates = areDatesValid(aDepartureDate, aFinalDate);
@@ -89,16 +91,37 @@ public class ScrapeManager {
 			return;			
 		}
 		
+
+		/*
+		 * Do things here~
+		 */
+		Logger.INFO("Initialising data to handle within Scraper Web Client. Mode: "+aValidDates);
+		AutoMap<Date> g;	
+		
 		if (aValidDates == 1 || aValidDates == 4) {
-			
+			g = Date.getDatesBetweenXAndYInclusive(DATE_SCAN_START, DATE_SCAN_START);			
 		}
 		else if (aValidDates == 9) {
-			
+			g = Date.getDatesBetweenXAndYInclusive(DATE_SCAN_START, DATE_SCAN_END);			
 		}
 		else {
 			close();
 			return;				
-		}		
+		}	
+		if (g.size() > 0) {			
+			String mTempURL = "http://www.momondo.com.au";		
+			
+			WebPage temp = new WebPage(mTempURL);
+			temp = null;
+			if (temp != null) {
+				MainFrame.getScrapeManager().mWorkerThreadPool.submit(temp);
+			}
+		}
+		else {
+			Logger.INFO("Did not find any Dates to scan.");
+		}
+		
+		
 	}
 	
 	public void close() {
@@ -113,13 +136,14 @@ public class ScrapeManager {
 	
 	public int areDatesValid(Date a0, Date a1) {
 		boolean z0 = false, z1 = false, z2 = false;
-		if (a0 != null) {
-			if (a0.month() != Month.BAD && a0.day() > 0 && a0.year() > 0) {
-				z0 = true;
-			}
-		}
-		if (a1 != null) {
+		if (a0 != null && a0.isValid()) {
 			z0 = true;
+		}
+		if (a1 == null) {
+			a1 = a0;
+		}
+		if (a1 != null && a1.isValid()) {
+			z1 = true;
 		}
 		if (z0 && z1) {
 			if (

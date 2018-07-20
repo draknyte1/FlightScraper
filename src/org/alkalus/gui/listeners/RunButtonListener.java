@@ -15,10 +15,9 @@ import org.alkalus.util.Utils;
 public class RunButtonListener implements ActionListener {
 	private int numClicks = 0;
 
-	public void actionPerformed(ActionEvent event){
+	public synchronized void actionPerformed(ActionEvent event){
 		numClicks++;
 		boolean r = verifyMainIsReady();
-		System.out.println("I was clicked " + numClicks + " times. "+r);
 		if (r) {
 			String a0, a1; // Airport Codes
 			Date b0, b1 = new Date(-1, Month.BAD, -1); // Depart date and End date
@@ -38,6 +37,7 @@ public class RunButtonListener implements ActionListener {
 
 			//If using extended dates, set the final date to search up until.
 			if (window().isUsingExtendedDates()) {
+				Logger.INFO("Enabling Extended Search parameters.");
 				c1 = Integer.valueOf(window().getField_Integer_Day_Finish_Scan().getText());
 				e1 = Utils.getMonthFromString((String) window().getCombo_Month_Finish().getSelectedItem());
 				d1 = Integer.valueOf((String) window().getCombo_Year_Finish().getSelectedItem());		
